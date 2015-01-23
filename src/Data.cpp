@@ -27,7 +27,7 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
 	matrix = NULL;
 	numTaxa = numChar = 0;
 	bool excludeLine = false, charSetLine = false, cladeLine = false;
-	bool *tempVec;
+	bool *tempVec = NULL;
 	while( getline(seqStream, linestring).good() )
 		{
 		std::istringstream linestream(linestring);
@@ -141,7 +141,8 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
 		line++;
 		}	
 
-	delete [] tempVec;
+    if (tempVec != NULL)
+        delete [] tempVec;
 	
 	/* close the file */
 	seqStream.close();
