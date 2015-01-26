@@ -30,6 +30,7 @@ Model::Model(Settings* sp, Data* dp, MbRandom* rp) {
     ranPtr      = rp;
     
     // instantiate model parameters
+    branchLengthPriorParm = settingsPtr->getBranchLengthPrior();
     alpha.push_back(1.0);
     alpha.push_back(1.0);
     for (int i=0; i<2; i++)
@@ -480,7 +481,7 @@ double Model::probInvariant(int space) {
 
 double Model::lnPriorRatio(int up, int down) {
 
-    return theTree[up]->lnPrior(40.0) - theTree[down]->lnPrior(40.0);
+    return theTree[up]->lnPrior() - theTree[down]->lnPrior();
 }
 
 void Model::mapCharacters(int space) {
@@ -678,7 +679,7 @@ bool Model::readTree(void) {
 		std::istringstream linestream(linestring);
         if (linestring != "")
             {
-            theTree[0] = new Tree(linestring, dataPtr, this, ranPtr, 0);
+            theTree[0] = new Tree(linestring, dataPtr, this, ranPtr, branchLengthPriorParm, 0);
             }
         }
 
@@ -769,8 +770,11 @@ double Model::updatePi(int space) {
     std::vector<Node*> theTreeNodes = theTree[space]->exposeNodes();
     for (int i=0; i<theTreeNodes.size(); i++)
         {
-        double x = theTreeNodes[i]->getBranchLength();
-        theTreeNodes[i]->setBranchLength(x);
+        if ( theTreeNodes[i] != theTree[space]->getRoot() )
+            {
+            double x = theTreeNodes[i]->getBranchProportion();
+            theTreeNodes[i]->setBranchProportion(x);
+            }
         }
     
 	return ranPtr->lnDirichletPdf(aReverse, oldFreqs) - ranPtr->lnDirichletPdf(aForward, newFreqs);

@@ -33,7 +33,7 @@ Node::Node(Model* mp, Tree* t, int nc) {
     for (int i=0; i<2*numChar; i++)
         cls[i] = 0.0;
 
-    setBranchLength(0.02);
+    setBranchProportion(1.0);
     descendants.clear();
 }
 
@@ -46,6 +46,11 @@ Node::~Node(void) {
     delete [] transitionProbabilities[0];
     delete [] transitionProbabilities;
     delete [] cls;
+}
+
+double Node::getBranchLength(void) {
+
+    return branchProportion * myTree->getTreeLength();
 }
 
 std::string Node::getDescendantsString(void) {
@@ -87,14 +92,14 @@ int Node::numberOfDescendantsWithFlag(bool tf) {
 
 void Node::print(void) {
 
-    std::cout << "address      = " << this << std::endl;
-    std::cout << "index        = " << index << std::endl;
-    std::cout << "memoryIdx    = " << memoryIdx << std::endl;
-    std::cout << "branchLength = " << branchLength << std::endl;
-    std::cout << "name         = " << name << std::endl;
-    std::cout << "modelPtr     = " << modelPtr << std::endl;
-    std::cout << "leafNode     = " << leafNode << std::endl;
-    std::cout << "flag         = " << flag << std::endl;
+    std::cout << "address          = " << this << std::endl;
+    std::cout << "index            = " << index << std::endl;
+    std::cout << "memoryIdx        = " << memoryIdx << std::endl;
+    std::cout << "branchProportion = " << branchProportion << std::endl;
+    std::cout << "name             = " << name << std::endl;
+    std::cout << "modelPtr         = " << modelPtr << std::endl;
+    std::cout << "leafNode         = " << leafNode << std::endl;
+    std::cout << "flag             = " << flag << std::endl;
     if (ancestor != NULL)
         std::cout << "ancestor     = " << ancestor->index << std::endl;
     else
@@ -124,9 +129,10 @@ void Node::printConditionalLikelihoods(int prec) {
     std::cout << transitionProbabilities[1][0] << " " << transitionProbabilities[1][1] << std::endl;
 }
 
-void Node::setBranchLength(double x) {
+void Node::setBranchProportion(double x) {
 
-    branchLength = x;
+    branchProportion = x;
+    double branchLength = getBranchLength();
     double* stationaryFrequencies = modelPtr->getPi(myTree->getMySpace());
     double u = 1.0 / (2.0 * stationaryFrequencies[0] * stationaryFrequencies[1]);
     double expPart = exp(-u*branchLength);

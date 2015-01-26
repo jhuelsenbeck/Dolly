@@ -13,7 +13,7 @@ class Node;
 class Tree {
     
 	public:
-                            Tree(std::string treeStr, Data* dp, Model* mp, MbRandom* rp, int space);
+                            Tree(std::string treeStr, Data* dp, Model* mp, MbRandom* rp, double lam, int space);
                             Tree(Tree& t, int space);
                            ~Tree(void);
         Tree&               operator=(Tree& t);
@@ -24,8 +24,9 @@ class Tree {
         int                 getNumNodes(void) { return (int)nodes.size(); }
         Node*               getRoot(void) { return root; }
         std::string         getTreeString(void);
+        double              getTreeLength(void) { return treeLength; }
         void                markPathToRootFromNode(Node* p);
-        double              lnPrior(double lambda);
+        double              lnPrior(void);
         void                print(void);
         void                setAllFlagsTo(bool tf);
         void                showNodeInfo(void);
@@ -34,12 +35,15 @@ class Tree {
         double              update(void);
         void                setMySpace(int x) { mySpace = x; }
         int                 getMySpace(void) { return mySpace; }
+        void                setTreeLength(double x) { treeLength = x; }
 
     private:
         void                clone(Tree& t);
         void                deleteNodes(void);
         void                passDn(Node* p);
         void                initializePartitions(void);
+        double              updateBranchProportions(void);
+        double              updateTreeLength(void);
         Data*               dataPtr;
         MbRandom*           ranPtr;
         Model*              modelPtr;
@@ -50,6 +54,8 @@ class Tree {
         std::vector<Node*>  downPassSequence;
         Node*               root;
         int                 mySpace;
+        double              treeLength;
+        double              lambda;
 };
 
 

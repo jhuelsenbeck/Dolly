@@ -30,6 +30,7 @@ class Model {
         void                                    reject(void);
         double                                  update(int space);
         CharacterChanges*                       getCharacterChange(int idx) { return characterChanges[idx]; }
+        double                                  getBranchLengthPriorParm(void) { return branchLengthPriorParm; }
 
     private:
         void                                    initializeConditionalLikelihood(void);
@@ -56,6 +57,7 @@ class Model {
         std::vector<double>                     proposalProbs;
         std::vector<CharacterChanges*>          characterChanges;
         std::vector<BranchChanges*>             branchChanges;
+        double                                  branchLengthPriorParm;
 };
 
 

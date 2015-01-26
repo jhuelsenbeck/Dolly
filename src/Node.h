@@ -19,7 +19,8 @@ class Node {
         double*                 exposeDummyConditionalLikelihoods(void) { return dummyCls; }
         double**                exposeTransitionProbability(void) { return transitionProbabilities; }
         Node*                   getAncestor(void) { return ancestor; }
-        double                  getBranchLength(void) { return branchLength; }
+        double                  getBranchLength(void);
+        double                  getBranchProportion(void) { return branchProportion; }
         std::set<Node*>&        getDescendants(void) { return descendants; }
         std::set<std::string>   getPartition(void) { return myPartition; }
         std::string             getDescendantsString(void);
@@ -35,7 +36,7 @@ class Node {
         void                    printConditionalLikelihoods(int prec);
         void                    removeDescendant(Node* p) { descendants.erase(p); }
         void                    removeDescendants(void) { descendants.clear(); }
-        void                    setBranchLength(double x);
+        void                    setBranchProportion(double x);
         void                    setFlag(bool tf) { flag = tf; }
         void                    setIndex(int x ) { index = x; }
         void                    setLeaf(bool tf) { leafNode = tf; }
@@ -49,7 +50,7 @@ class Node {
         Tree*                   myTree;
         int                     index;
         size_t                  memoryIdx;
-        double                  branchLength;
+        double                  branchProportion;
         std::string             name;
         bool                    leafNode;
         Node*                   ancestor;
