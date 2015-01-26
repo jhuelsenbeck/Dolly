@@ -9,12 +9,13 @@
 #include "Tree.h"
 
 
-Tree::Tree(std::string treeStr, Data* dp, Model* mp, MbRandom* rp, int space) {
+Tree::Tree(std::string treeStr, Data* dp, Model* mp, MbRandom* rp, double lam, int space) {
 
     dataPtr = dp;
     modelPtr = mp;
     ranPtr = rp;
     mySpace = space;
+    lambda = lam;
     interpretTreeString(treeStr);
     //print();
 }
@@ -43,6 +44,8 @@ void Tree::clone(Tree& t) {
     dataPtr     = t.dataPtr;
     ranPtr      = t.ranPtr;
     modelPtr    = t.modelPtr;
+    treeLength  = t.treeLength;
+    lambda      = t.lambda;
     
     if (nodes.size() != t.nodes.size())
         {
@@ -63,13 +66,13 @@ void Tree::clone(Tree& t) {
         if (sourceNode == t.root)
             root = myNode;
 
-        myNode->modelPtr     = sourceNode->modelPtr;
-        myNode->index        = sourceNode->index;
-        myNode->branchLength = sourceNode->branchLength;
-        myNode->name         = sourceNode->name;
-        myNode->leafNode     = sourceNode->leafNode;
-        myNode->myPartition  = sourceNode->myPartition;
-        myNode->flag         = sourceNode->flag;
+        myNode->modelPtr         = sourceNode->modelPtr;
+        myNode->index            = sourceNode->index;
+        myNode->branchProportion = sourceNode->branchProportion;
+        myNode->name             = sourceNode->name;
+        myNode->leafNode         = sourceNode->leafNode;
+        myNode->myPartition      = sourceNode->myPartition;
+        myNode->flag             = sourceNode->flag;
         for (int i=0; i<2; i++)
             for (int j=0; j<2; j++)
                 myNode->transitionProbabilities[i][j] = sourceNode->transitionProbabilities[i][j];
@@ -212,6 +215,25 @@ void Tree::interpretTreeString(std::string treeStr) {
     // set memory indices
     for (int i=0; i<nodes.size(); i++)
         nodes[i]->setMemoryIdx(i);
+    
+    // renormalize branch proportions to sum to one
+    double sum = 0.0;
+    for (int i=0; i<nodes.size(); i++)
+        {
+        if (nodes[i] != root)
+            sum += nodes[i]->getBranchProportion();
+        }
+    treeLength = 0.0;
+    std::cout << "lambda=" << lambda << " tl=" << treeLength << std::endl;
+    for (int i=0; i<nodes.size(); i++)
+        {
+        if (nodes[i] != root)
+            {
+            double x = nodes[i]->getBranchProportion();
+            nodes[i]->setBranchProportion(x / sum);
+            treeLength += ranPtr->exponentialRv(lambda);
+            }
+        }
 }
 
 void Tree::markPathToRootFromNode(Node* p) {
@@ -227,7 +249,7 @@ void Tree::markPathToRootFromNode(Node* p) {
     q->setFlag(true);
 }
 
-double Tree::lnPrior(double lambda) {
+double Tree::lnPrior(void) {
 
     double lnP = 0.0;
     for (int i=0; i<nodes.size(); i++)
@@ -289,18 +311,80 @@ void Tree::showNodeInfo(void) {
 
 double Tree::update(void) {
 
+    double u = ranPtr->uniformRv();
+    if (u < 0.8)
+        return updateBranchProportions();
+    else
+        return updateTreeLength();
+}
+
+double Tree::updateBranchProportions(void) {
+
+    // pick a node to update
     Node* nde = NULL;
     do
         {
         nde = nodes[(int)(nodes.size()*ranPtr->uniformRv())];
         } while(nde == root);
+
+    // initialize some variables
+    double alpha0 = 1000.0;
+	std::vector<double> aForward(2);
+	std::vector<double> aReverse(2);
+	std::vector<double> oldProps(2);
+    std::vector<double> newProps(2);
+
+    // propose new values
+    oldProps[0] = nde->getBranchProportion();
+    oldProps[1] = 1.0 - oldProps[0];
+    aForward[0] = oldProps[0] * alpha0;
+    aForward[1] = oldProps[1] * alpha0;
+	ranPtr->dirichletRv(aForward, newProps);
+    aReverse[0] = newProps[0] * alpha0;
+    aReverse[1] = newProps[1] * alpha0;
     
-    double tuning = log(4.0);
-    double oldV = nde->getBranchLength();
-    double newV = oldV * exp( tuning*(ranPtr->uniformRv()-0.5) );
-    nde->setBranchLength(newV);
+    // set the branch proportions (and update the branch lengths)
+    double f = newProps[1]/oldProps[1];
+    int n = 0;
+    for (int i=0; i<nodes.size(); i++)
+        {
+        Node* tn = nodes[i];
+        if (tn != root)
+            {
+            if ( tn == nde )
+                tn->setBranchProportion(newProps[0]);
+            else
+                {
+                double x = tn->getBranchProportion();
+                tn->setBranchProportion(x * f);
+                n++;
+                }
+            }
+        }
     
-    return (log(newV) - log(oldV));
+    double lnProposalRatio = ranPtr->lnDirichletPdf(aReverse, oldProps) - ranPtr->lnDirichletPdf(aForward, newProps);
+    lnProposalRatio += n * log(f); // Jacobian
+    return lnProposalRatio;
+}
+
+double Tree::updateTreeLength(void) {
+
+    double tuning = log(1.1);
+    double oldL = treeLength;
+    double newL = oldL * exp( tuning*(ranPtr->uniformRv()-0.5) );
+    setTreeLength(newL);
+
+    for (int i=0; i<nodes.size(); i++)
+        {
+        Node* tn = nodes[i];
+        if (tn != root)
+            {
+            double x = tn->getBranchProportion();
+            tn->setBranchProportion(x);
+            }
+        }
+    
+    return (log(newL) - log(oldL));
 }
 
 std::string Tree::getTreeString(void) {

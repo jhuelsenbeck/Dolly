@@ -10,9 +10,9 @@
 
 Settings::Settings(int argc, char *argv[]) {
 
-#   if 0
+#   if 1
 	// set up fake command-line argument string
-	char* cmdString[20];
+	char* cmdString[22];
 	cmdString[ 0] = (char *)"dollo";
 	cmdString[ 1] = (char *)"-input_file";
 	cmdString[ 2] = (char *)"/Users/johnh/Desktop/DolloPlusData/states";
@@ -33,7 +33,9 @@ Settings::Settings(int argc, char *argv[]) {
 	cmdString[16] = (char *)"10";
 	cmdString[17] = (char *)"-use_errors";
 	cmdString[18] = (char *)"no";
-	argc = 19;
+	cmdString[19] = (char *)"-brlen_prior";
+	cmdString[20] = (char *)"40.0";
+	argc = 21;
 	argv = cmdString;
 #   endif
 
@@ -47,6 +49,7 @@ Settings::Settings(int argc, char *argv[]) {
     outputFileName             = "";
     printFrequency             = 10;
     sampleFrequency            = 10;
+    branchLengthPrior          = 40.0;
     
 	if (argc > 1)
 		{
@@ -80,6 +83,8 @@ Settings::Settings(int argc, char *argv[]) {
 					status = "print_freq";
 				else if ( cmd == "-sample_freq" )
 					status = "sample_freq";
+				else if ( cmd == "-brlen_prior" )
+					status = "brlen_prior";
 				else
 					{
 					std::cerr << "Could not interpret option \"" << cmd << "\"." << std::endl;
@@ -133,6 +138,10 @@ Settings::Settings(int argc, char *argv[]) {
 					{
 					sampleFrequency = atoi(argv[i]);
 					}
+				else if ( status == "brlen_prior" )
+					{
+					branchLengthPrior = (double)atof(argv[i]);
+					}
 				else
 					{
 					Msg::error("Unknown status reading command line information");
@@ -160,6 +169,7 @@ void Settings::print(void) {
 	std::cout << "   * Burn In                    = " << burnIn                     << std::endl;
 	std::cout << "   * Print frequency            = " << printFrequency             << std::endl;
 	std::cout << "   * Parameter sample frequency = " << sampleFrequency            << std::endl;
+	std::cout << "   * Branch length prior parm   = " << branchLengthPrior          << std::endl;
 	std::cout << std::endl;
 }
 
