@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
-
+#include <stdio.h>
 
 
 Node::Node(Model* mp, Tree* t, int nc) {

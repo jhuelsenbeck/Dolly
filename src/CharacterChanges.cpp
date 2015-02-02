@@ -1,5 +1,6 @@
 #include <iomanip>
 #include <iostream>
+#include <stdio.h>
 #include "CharacterChanges.h"
 #include "Msg.h"
 

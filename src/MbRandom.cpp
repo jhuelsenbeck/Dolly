@@ -36,6 +36,7 @@
 #include <ctime>
 #include <iostream>
 #include <vector>
+#include <stdlib.h>
 #include "MbRandom.h"
 
 /*!

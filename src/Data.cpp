@@ -3,6 +3,7 @@
 #include <istream>
 #include <sstream>
 #include <fstream>
+#include <stdlib.h>
 #include "Clades.h"
 #include "Data.h"
 #include "Msg.h"

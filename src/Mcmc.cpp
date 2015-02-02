@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <stdio.h>
 #include "BranchChanges.h"
 #include "CharacterChanges.h"
 #include "MbRandom.h"
