@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 void printHeader(void) {
 
     std::cout << std::endl;
-	std::cout << "   Dollo+" << std::endl;
+	std::cout << "   Dolly" << std::endl;
 	std::cout << "   John P. Huelsenbeck & Daniel J. Richter" << std::endl;
 	std::cout << "   University of California, Berkeley" << std::endl;
     std::cout << std::endl;
