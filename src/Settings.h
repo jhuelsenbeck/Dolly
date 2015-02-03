@@ -18,6 +18,7 @@ class Settings {
         int             getSampleFrequency(void) { return sampleFrequency; }
         std::string     getTreeFileName(void) { return treeFileName; }
         double          getBranchLengthPrior(void) { return branchLengthPrior; }
+        bool            getFixBranchProportionsToUserTree(void) { return fixBranchProportionsToUserTree; }
         void            print(void);
         void            setBurnIn(int x) { burnIn = x; }
         void            setChainLength(int x) { chainLength = x; }
@@ -29,6 +30,7 @@ class Settings {
         void            setErrorProbabilitiesFileName(std::string s) { errorProbabilitiesFileName = s; }
         void            setUseErrorProbs(bool tf) { useErrorProbs = tf; }
         void            setBranchLengthPrior(double x) { branchLengthPrior = x; }
+        void            setBranchProportionsToUserTree(bool tf) { fixBranchProportionsToUserTree = tf; }
     private:
         void            printUsage(void);
         int             chainLength;
@@ -41,6 +43,7 @@ class Settings {
         int             printFrequency;
         int             sampleFrequency;
         double          branchLengthPrior;
+        bool            fixBranchProportionsToUserTree;
 };
 
 

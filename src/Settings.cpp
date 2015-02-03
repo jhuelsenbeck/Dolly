@@ -1,6 +1,6 @@
 #include "Msg.h"
 #include "Settings.h"
-//#include "Util.h"
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -13,19 +13,20 @@ Settings::Settings(int argc, char *argv[]) {
 
 #   if 1
 	// set up fake command-line argument string
-	char* cmdString[22];
+	char* cmdString[24];
 	cmdString[ 0] = (char *)"dollo";
 	cmdString[ 1] = (char *)"-input_file";
-	cmdString[ 2] = (char *)"/Users/johnh/Desktop/DolloPlusData/states";
-//	cmdString[ 2] = (char *)"/Users/johnh/Desktop/DolloPlusData/teststates";
+	cmdString[ 2] = (char *)"/Users/johnh/Dolly/example_data/single_site/gene_presence_absence";
+  //cmdString[ 2] = (char *)"/Users/johnh/Desktop/DolloPlusData/states";
 	cmdString[ 3] = (char *)"-tree_file";
-	cmdString[ 4] = (char *)"/Users/johnh/Desktop/DolloPlusData/unrooted_tree_no_branch_lengths";
+	cmdString[ 4] = (char *)"/Users/johnh/Dolly/example_data/single_site/with_branch_lengths.tree";
+  //cmdString[ 4] = (char *)"/Users/johnh/Desktop/DolloPlusData/unrooted_tree_no_branch_lengths";
 	cmdString[ 5] = (char *)"-error_file";
 	cmdString[ 6] = (char *)"/Users/johnh/Desktop/DolloPlusData/probabilities";
 	cmdString[ 7] = (char *)"-output_file";
 	cmdString[ 8] = (char *)"/Users/johnh/Desktop/DolloPlusResults/out";
 	cmdString[ 9] = (char *)"-length";
-	cmdString[10] = (char *)"10000";
+	cmdString[10] = (char *)"1000";
 	cmdString[11] = (char *)"-burn";
 	cmdString[12] = (char *)"0";
 	cmdString[13] = (char *)"-print_freq";
@@ -36,21 +37,24 @@ Settings::Settings(int argc, char *argv[]) {
 	cmdString[18] = (char *)"no";
 	cmdString[19] = (char *)"-brlen_prior";
 	cmdString[20] = (char *)"40.0";
-	argc = 21;
+	cmdString[21] = (char *)"-user_brlens";
+	cmdString[22] = (char *)"yes";
+	argc = 23;
 	argv = cmdString;
 #   endif
 
     // default values
-    chainLength                = 1000;
-    burnIn                     = 0;
-    useErrorProbs              = false;
-    inputFileName              = "";
-    errorProbabilitiesFileName = "";
-    treeFileName               = "";
-    outputFileName             = "";
-    printFrequency             = 10;
-    sampleFrequency            = 10;
-    branchLengthPrior          = 40.0;
+    chainLength                    = 1000;
+    burnIn                         = 0;
+    useErrorProbs                  = false;
+    inputFileName                  = "";
+    errorProbabilitiesFileName     = "";
+    treeFileName                   = "";
+    outputFileName                 = "";
+    printFrequency                 = 10;
+    sampleFrequency                = 10;
+    branchLengthPrior              = 40.0;
+    fixBranchProportionsToUserTree = false;
     
 	if (argc > 1)
 		{
@@ -86,6 +90,8 @@ Settings::Settings(int argc, char *argv[]) {
 					status = "sample_freq";
 				else if ( cmd == "-brlen_prior" )
 					status = "brlen_prior";
+				else if ( cmd == "-user_brlens" )
+					status = "user_brlens";
 				else
 					{
 					std::cerr << "Could not interpret option \"" << cmd << "\"." << std::endl;
@@ -142,6 +148,17 @@ Settings::Settings(int argc, char *argv[]) {
 				else if ( status == "brlen_prior" )
 					{
 					branchLengthPrior = (double)atof(argv[i]);
+					}
+				else if ( status == "user_brlens" )
+					{
+                    std::string str = argv[i];
+                    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+                    if (str[0] == 'y' && str[1] == 'e' && str[2] == 's')
+                        fixBranchProportionsToUserTree = true;
+                    else if (str[0] == 'n' && str[1] == 'o')
+                        fixBranchProportionsToUserTree = false;
+                    else
+                        Msg::error("Unknown option for command \"user_brlens\"");
 					}
 				else
 					{

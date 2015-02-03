@@ -679,7 +679,7 @@ bool Model::readTree(void) {
 		std::istringstream linestream(linestring);
         if (linestring != "")
             {
-            theTree[0] = new Tree(linestring, dataPtr, this, ranPtr, branchLengthPriorParm, 0);
+            theTree[0] = new Tree(linestring, settingsPtr, dataPtr, this, ranPtr, branchLengthPriorParm, 0);
             }
         }
 

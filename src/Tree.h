@@ -9,11 +9,12 @@ class Data;
 class MbRandom;
 class Model;
 class Node;
+class Settings;
 
 class Tree {
     
 	public:
-                            Tree(std::string treeStr, Data* dp, Model* mp, MbRandom* rp, double lam, int space);
+                            Tree(std::string treeStr, Settings* sp, Data* dp, Model* mp, MbRandom* rp, double lam, int space);
                             Tree(Tree& t, int space);
                            ~Tree(void);
         Tree&               operator=(Tree& t);
@@ -47,6 +48,7 @@ class Tree {
         Data*               dataPtr;
         MbRandom*           ranPtr;
         Model*              modelPtr;
+        Settings*           settingsPtr;
         void                interpretTreeString(std::string treeStr);
         void                showNodes(Node* p, int indent);
         void                writeTree(Node* p, std::stringstream& ss);

@@ -6,16 +6,18 @@
 #include "MbRandom.h"
 #include "Msg.h"
 #include "Node.h"
+#include "Settings.h"
 #include "Tree.h"
 
 
-Tree::Tree(std::string treeStr, Data* dp, Model* mp, MbRandom* rp, double lam, int space) {
+Tree::Tree(std::string treeStr, Settings *sp, Data* dp, Model* mp, MbRandom* rp, double lam, int space) {
 
-    dataPtr = dp;
-    modelPtr = mp;
-    ranPtr = rp;
-    mySpace = space;
-    lambda = lam;
+    dataPtr     = dp;
+    modelPtr    = mp;
+    ranPtr      = rp;
+    settingsPtr = sp;
+    mySpace     = space;
+    lambda      = lam;
     interpretTreeString(treeStr);
     //print();
 }
@@ -44,6 +46,7 @@ void Tree::clone(Tree& t) {
     dataPtr     = t.dataPtr;
     ranPtr      = t.ranPtr;
     modelPtr    = t.modelPtr;
+    settingsPtr = t.settingsPtr;
     treeLength  = t.treeLength;
     lambda      = t.lambda;
     
@@ -145,6 +148,8 @@ void Tree::interpretTreeString(std::string treeStr) {
     std::string nameStr = "";
     Node* p = NULL;
     int interiorNodeIdx = dataPtr->getNumTaxa();
+    bool readingTaxon = true;
+    bool foundUserBrlens = false;
     for (int i=0; i<treeStr.size(); i++)
         {
         char c = treeStr[i];
@@ -177,30 +182,46 @@ void Tree::interpretTreeString(std::string treeStr) {
         else if (c == ';')
             {
             }
+        else if (c == ':')
+            {
+            readingTaxon = false;
+            }
         else if (c != ' ')
             {
             nameStr += c;
             if ( treeStr[i+1] == ')' || treeStr[i+1] == '(' ||
-                 treeStr[i+1] == ',' || treeStr[i+1] == ';' )
+                 treeStr[i+1] == ',' || treeStr[i+1] == ';' || treeStr[i+1] == ':' )
                 {
-                int taxonIdx = dataPtr->getTaxonIndex(nameStr);
-                if (taxonIdx == -1)
-                    Msg::error("Problem finding taxon " + nameStr);
-                Node* newNode = new Node(modelPtr, this, dataPtr->getNumChar());
-                newNode->setLeaf(true);
-                newNode->setName(nameStr);
-                newNode->setIndex(taxonIdx);
-                if (p == NULL)
+                if (readingTaxon == true)
                     {
-                    root = newNode;
+                    int taxonIdx = dataPtr->getTaxonIndex(nameStr);
+                    if (taxonIdx == -1)
+                        Msg::error("Problem finding taxon " + nameStr);
+                    Node* newNode = new Node(modelPtr, this, dataPtr->getNumChar());
+                    newNode->setLeaf(true);
+                    newNode->setName(nameStr);
+                    newNode->setIndex(taxonIdx);
+                    if (p == NULL)
+                        {
+                        root = newNode;
+                        }
+                    else
+                        {
+                        p->addDescendant(newNode);
+                        newNode->setAncestor(p);
+                        }
+                    tipNodes[taxonIdx] = newNode;
+                    p = newNode;
                     }
                 else
                     {
-                    p->addDescendant(newNode);
-                    newNode->setAncestor(p);
+                    double x;
+                    std::istringstream buf(nameStr);
+                    buf >> x;
+                    p->setBranchProportion(x);
+                    readingTaxon = true;
+                    foundUserBrlens = true;
                     }
-                tipNodes[taxonIdx] = newNode;
-                p = newNode;
                 nameStr = "";
                 }
             }
@@ -215,6 +236,16 @@ void Tree::interpretTreeString(std::string treeStr) {
     // set memory indices
     for (int i=0; i<nodes.size(); i++)
         nodes[i]->setMemoryIdx(i);
+    
+    //
+    if (settingsPtr->getFixBranchProportionsToUserTree() == false || foundUserBrlens == false)
+        {
+        for (int i=0; i<nodes.size(); i++)
+            {
+            if (nodes[i] != root)
+                nodes[i]->setBranchProportion(1.0);
+            }
+        }
     
     // renormalize branch proportions to sum to one
     double sum = 0.0;
@@ -311,8 +342,12 @@ void Tree::showNodeInfo(void) {
 
 double Tree::update(void) {
 
+    double updateBranchProportionsWithProb = 0.8;
+    if (settingsPtr->getFixBranchProportionsToUserTree() == true)
+        updateBranchProportionsWithProb = 0.0;
+
     double u = ranPtr->uniformRv();
-    if (u < 0.8)
+    if (u < updateBranchProportionsWithProb)
         return updateBranchProportions();
     else
         return updateTreeLength();
@@ -401,7 +436,7 @@ void Tree::writeTree(Node* p, std::stringstream& ss) {
 		{
 		if (p->isLeaf() == true)
 			{
-			ss << p->getName() << ":" << std::fixed << std::setprecision(2) << p->getBranchLength();
+			ss << p->getName() << ":" << std::fixed << std::setprecision(6) << p->getBranchLength();
 			}
 		else
 			{
@@ -415,7 +450,7 @@ void Tree::writeTree(Node* p, std::stringstream& ss) {
                     ss << ",";
                 i++;
                 }
-            ss << "):" << std::fixed << std::setprecision(2) << p->getBranchLength();
+            ss << "):" << std::fixed << std::setprecision(6) << p->getBranchLength();
             }
 		}
 }
