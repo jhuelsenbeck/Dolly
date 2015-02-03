@@ -450,7 +450,10 @@ void Tree::writeTree(Node* p, std::stringstream& ss) {
                     ss << ",";
                 i++;
                 }
-            ss << "):" << std::fixed << std::setprecision(6) << p->getBranchLength();
+            if (p == root)
+                ss << ");";
+            else
+                ss << "):" << std::fixed << std::setprecision(6) << p->getBranchLength();
             }
 		}
 }
