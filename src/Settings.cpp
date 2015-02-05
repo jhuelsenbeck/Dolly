@@ -11,7 +11,7 @@
 
 Settings::Settings(int argc, char *argv[]) {
 
-#   if 0
+#   if 1
 	// set up fake command-line argument string
 	char* cmdString[24];
 	cmdString[ 0] = (char *)"dollo";
