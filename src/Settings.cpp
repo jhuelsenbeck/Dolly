@@ -11,7 +11,7 @@
 
 Settings::Settings(int argc, char *argv[]) {
 
-#   if 1
+#   if 0
 	// set up fake command-line argument string
 	char* cmdString[24];
 	cmdString[ 0] = (char *)"dollo";
@@ -179,34 +179,37 @@ Settings::Settings(int argc, char *argv[]) {
 void Settings::print(void) {
     
 	std::cout << "   Analysis information:" << std::endl;
-	std::cout << "   * Input file name            = " << inputFileName              << std::endl;
-	std::cout << "   * Tree file name             = " << treeFileName               << std::endl;
-	std::cout << "   * Error file name            = " << errorProbabilitiesFileName << std::endl;
-	std::cout << "   * Output file name           = " << outputFileName             << std::endl;
-	std::cout << "   * Chain length               = " << chainLength                << std::endl;
-	std::cout << "   * Burn In                    = " << burnIn                     << std::endl;
-	std::cout << "   * Print frequency            = " << printFrequency             << std::endl;
-	std::cout << "   * Parameter sample frequency = " << sampleFrequency            << std::endl;
-	std::cout << "   * Branch length prior parm   = " << branchLengthPrior          << std::endl;
+	std::cout << "   * Input file name                     = " << inputFileName                  << std::endl;
+	std::cout << "   * Tree file name                      = " << treeFileName                   << std::endl;
+	std::cout << "   * Output file name                    = " << outputFileName                 << std::endl;
+	std::cout << "   * Error file name                     = " << errorProbabilitiesFileName     << std::endl;
+	std::cout << "   * Use error probabilities             = " << (useErrorProbs == 1 ? "yes" : "no") << std::endl;
+	std::cout << "   * Chain length                        = " << chainLength                    << std::endl;
+	std::cout << "   * Burn In                             = " << burnIn                         << std::endl;
+	std::cout << "   * Print frequency                     = " << printFrequency                 << std::endl;
+	std::cout << "   * Parameter sample frequency          = " << sampleFrequency                << std::endl;
+	std::cout << "   * Branch length prior parm            = " << branchLengthPrior              << std::endl;
+	std::cout << "   * Fix branch length prop to user tree = " << (fixBranchProportionsToUserTree == 1 ? "yes" : "no") << std::endl;
 	std::cout << std::endl;
 }
 
 void Settings::printUsage(void) {
     
 	std::cout << "Usage:" << std::endl;
-	std::cout << "   -input_file <FILE NAME>  : Area file name" << std::endl;
-	std::cout << "   -tree_file <FILE NAME>   : Tree file name" << std::endl;
-    std::cout << "   -use_errors <yes/no>     : Whether to use the error probabilities" << std::endl;
-	std::cout << "   -error_file <FILE NAME>  : File containing error probabilities for gene presence/absence" << std::endl;
-	std::cout << "   -output_file <FILE NAME> : Output file name" << std::endl;
-	std::cout << "   -length <NUMBER>         : Number of MCMC cycles" << std::endl;
-	std::cout << "   -burn <NUMBER>           : Number of MCMC cycles to discard (burn)" << std::endl;
-	std::cout << "   -print_freq <NUMBER>     : Frequency with which information is printed to the screen" << std::endl;
-	std::cout << "   -sample_freq <NUMBER>    : Frequency with which information is printed to files" << std::endl;
+	std::cout << "   -input_file <FILE NAME>  : Gene presence/absence file name [required]" << std::endl;
+	std::cout << "   -tree_file <FILE NAME>   : Tree file name in Newick format [required]" << std::endl;
+	std::cout << "   -output_file <FILE NAME> : Output file name [required]" << std::endl;
+	std::cout << "   -error_file <FILE NAME>  : File containing probabilities for gene presence [optional]" << std::endl;
+        std::cout << "   -use_errors <yes/no>     : Whether to use probabilities for gene presence [default " << (useErrorProbs == 1 ? "yes" : "no") << "]" << std::endl;
+	std::cout << "   -length <NUMBER>         : Number of MCMC cycles [default " << chainLength << "]" << std::endl;
+	std::cout << "   -burn <NUMBER>           : Number of MCMC cycles to discard (burn) [default " << burnIn << "]" << std::endl;
+	std::cout << "   -print_freq <NUMBER>     : Frequency with which information is printed to the screen [default " << printFrequency << "]" << std::endl;
+	std::cout << "   -sample_freq <NUMBER>    : Frequency with which information is printed to files [default " << sampleFrequency << "]" << std::endl;
+	std::cout << "   -brlen_prior <NUMBER>    : Branch length prior parameter [default " << branchLengthPrior << "]" << std::endl;
+	std::cout << "   -user_brlens <yes/no>    : Fix branch length proportions to user tree [default " << (fixBranchProportionsToUserTree == 1 ? "yes" : "no") << "]" << std::endl;
     
 	std::cout << std::endl;
 	std::cout << "Example:" << std::endl;
-	std::cout << "   ./dollo -input_file <input file> -output_file <output file>" << std::endl;
+	std::cout << "   ./dolly -input_file <input file> -tree_file <tree file> -output_file <output file>" << std::endl;
 	exit(1);
 }
-
