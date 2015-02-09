@@ -54,4 +54,4 @@ Tree.o:	Tree.cpp
 		$(CC) $(CFLAGS) -c Tree.cpp
 
 clean:		
-		rm -f *.o
+		rm -f $(OBJECTS) $(PROGS)
