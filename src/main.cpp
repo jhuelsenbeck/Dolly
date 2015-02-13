@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     Settings mySettings( argc, argv );
     
     // read the data
-    Data myData( mySettings.getInputFileName(), mySettings.getErrorProbabilitiesFileName(), mySettings.getUseErrorProbs() );
+    Data myData( mySettings.getInputFileName(), mySettings.getGenePresenceProbabilitiesFileName(), mySettings.getUseGenePresenceProbs() );
     
     // set up the phylogenetic model
     Model myModel( &mySettings, &myData, &myRandom );

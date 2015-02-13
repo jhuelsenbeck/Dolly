@@ -10,7 +10,7 @@
 
 
 
-Data::Data(std::string fileName, std::string errorName, bool useErrors) {
+Data::Data(std::string fileName, std::string genePresenceProbabilitiesFileName, bool useGenePresenceProbabilities) {
 
     std::cout << "   * Reading gene presence/absence information" << std::endl;
 	/* open the state data file */
@@ -152,31 +152,31 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
     for (std::vector<Clades*>::iterator it = clades.begin(); it != clades.end(); it++)
         (*it)->print();
 
-    // allocate a matrix for the probabilities
-    errorProbabilities = new double*[numTaxa];
-    errorProbabilities[0] = new double[numTaxa*numChar];
+    // allocate a matrix for the presence probabilities
+    genePresenceProbabilities = new double*[numTaxa];
+    genePresenceProbabilities[0] = new double[numTaxa*numChar];
     for (int i=1; i<numTaxa; i++)
-        errorProbabilities[i] = errorProbabilities[i-1] + numChar;
+        genePresenceProbabilities[i] = genePresenceProbabilities[i-1] + numChar;
     for (int i=0; i<numTaxa; i++)
         for (int j=0; j<numChar; j++)
-            errorProbabilities[i][j] = 0.0;
+            genePresenceProbabilities[i][j] = 0.0;
 
-    // read the error file
-    if ( useErrors == true )
+    // read the gene presence probabilities file
+    if ( useGenePresenceProbabilities == true )
         {
-        std::cout << "   * Reading error probabilities" << std::endl;
-        // open the error file
-        std::ifstream errStream(errorName.c_str());
-        if (!errStream)
+        std::cout << "   * Reading gene presence probabilities" << std::endl;
+        // open the gene presence probabilities file
+        std::ifstream genePresenceProbabilitiesFileStream(genePresenceProbabilitiesFileName.c_str());
+        if (!genePresenceProbabilitiesFileStream)
             {
-            std::cerr << "Cannot open file \"" + errorName + "\"" << std::endl;
+            std::cerr << "Cannot open file \"" + genePresenceProbabilitiesFileName + "\"" << std::endl;
             exit(1);
             }
 
         linestring = "";
         line = 0;
         taxonNum = 0;
-        while( getline(errStream, linestring).good() )
+        while( getline(genePresenceProbabilitiesFileStream, linestring).good() )
             {
             std::istringstream linestream(linestring);
             int ch;
@@ -202,12 +202,12 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
                     if (wordNum == 1)
                         {
                         if (x != numTaxa)
-                            Msg::error("Incorrect number of taxa in error file");
+                            Msg::error("Incorrect number of taxa in gene presence probabilities file");
                         }
                     else
                         {
                         if (x != numChar)
-                            Msg::error("Incorrect number of characters in error file");
+                            Msg::error("Incorrect number of characters in gene presence probabilities file");
                         }
                     }
                 else
@@ -215,7 +215,7 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
                     if (wordNum == 1)
                         {
                         if (word != taxonNames[taxonNum])
-                            Msg::error("Mismatched taxon names in error file");
+                            Msg::error("Mismatched taxon names in gene presence probabilities file");
                         taxonNum++;
                         std::cout << "     Reading taxon " << taxonNum << std::endl;
                         }
@@ -234,7 +234,7 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
                                     double x;
                                     std::istringstream buf(word);
                                     buf >> x;
-                                    errorProbabilities[taxonNum-1][siteNum++] = x;
+                                    genePresenceProbabilities[taxonNum-1][siteNum++] = x;
                                     numStr = "";
                                     }
                                 }
@@ -248,7 +248,7 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
                     double x;
                     std::istringstream buf(word);
                     buf >> x;
-                    errorProbabilities[taxonNum-1][siteNum++] = x;
+                    genePresenceProbabilities[taxonNum-1][siteNum++] = x;
                     numStr = "";
                     }
 
@@ -257,8 +257,8 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
             line++;
             }	
         
-        // close the error file
-        errStream.close();
+        // close the gene presence probabilities file
+        genePresenceProbabilitiesFileStream.close();
         }
     
     // check the data matrix for all zero or all one patterns, which should not be there
@@ -321,15 +321,15 @@ Data::Data(std::string fileName, std::string errorName, bool useErrors) {
             for (int i=0; i<numTaxa; i++)
                 {
                 newIntMatrix[i][k] = matrix[i][j];
-                newDoubleMatrix[i][k] = errorProbabilities[i][j];
+                newDoubleMatrix[i][k] = genePresenceProbabilities[i][j];
                 }
             k++;
             }
         }
     freeDataMatrix(matrix);
-    freeDataMatrix(errorProbabilities);
+    freeDataMatrix(genePresenceProbabilities);
     matrix = newIntMatrix;
-    errorProbabilities = newDoubleMatrix;
+    genePresenceProbabilities = newDoubleMatrix;
     numChar -= numInvalidPatterns;
 
 }
@@ -348,8 +348,8 @@ Data::~Data(void) {
 		delete [] compressedMatrix[0];
 		delete [] compressedMatrix;
 		}
-	delete [] errorProbabilities[0];
-	delete [] errorProbabilities;
+	delete [] genePresenceProbabilities[0];
+	delete [] genePresenceProbabilities;
 }
 
 
@@ -466,9 +466,9 @@ int Data::getCharacter(int i, int j) {
 		
 }
 
-double Data::getErrorProbability (int i, int j) {
+double Data::getGenePresenceProbability (int i, int j) {
 
-    return errorProbabilities[i][j];
+    return genePresenceProbabilities[i][j];
 }
 
 
@@ -746,14 +746,14 @@ void Data::print(void) {
 	std::cout << "Number of sites = " << sum << std::endl;
 }
 
-void Data::printErrorProbabilities(void) {
+void Data::printGenePresenceProbabilities(void) {
 
     for (int j=0; j<numChar; j++)
         {
         std::cout << std::setw(4) << j << " -- ";
         for (int i=0; i<numTaxa; i++)
             {
-            std::cout << std::fixed << std::setprecision(3) << errorProbabilities[i][j] << " ";
+            std::cout << std::fixed << std::setprecision(3) << genePresenceProbabilities[i][j] << " ";
             }
         std::cout << std::endl;
         }

@@ -295,13 +295,13 @@ void Model::initializeConditionalLikelihood(void) {
                 dataPtr->getPossibleChars(charCode, possibleChars);
                 p[0] = (double)possibleChars[0];
                 p[1] = (double)possibleChars[1];
-                if (settingsPtr->getUseErrorProbs() == true)
+                if (settingsPtr->getUseGenePresenceProbs() == true)
                     {
                     if (possibleChars[0] == 0 && possibleChars[1] == 1)
                         {
-                        double e = dataPtr->getErrorProbability(i, j);
+                        double e = dataPtr->getGenePresenceProbability(i, j);
                         if (e < 0.0 || e > 1.0)
-                            Msg::error("Nonsense probability");
+                            Msg::error("Nonsense gene presence probability");
                         p[0] = 1.0 - e;
                         p[1] = e;
                         }

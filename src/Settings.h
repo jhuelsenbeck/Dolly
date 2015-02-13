@@ -10,8 +10,8 @@ class Settings {
                         Settings(int argc, char* argv[]);
         int             getBurnIn(void) { return burnIn; }
         int             getChainLength(void) { return chainLength; }
-        std::string     getErrorProbabilitiesFileName(void) { return errorProbabilitiesFileName; }
-        bool            getUseErrorProbs(void) { return useErrorProbs; }
+        std::string     getGenePresenceProbabilitiesFileName(void) { return genePresenceProbabilitiesFileName; }
+        bool            getUseGenePresenceProbs(void) { return useGenePresenceProbs; }
         std::string     getInputFileName(void) { return inputFileName; }
         std::string     getOutputFileName(void) { return outputFileName; }
         int             getPrintFrequency(void) { return printFrequency; }
@@ -27,17 +27,17 @@ class Settings {
         void            setPrintFrequency(int x) { printFrequency = x; }
         void            setSampleFrequency(int x) { sampleFrequency = x; }
         void            setTreeFileName(std::string s) { treeFileName = s; }
-        void            setErrorProbabilitiesFileName(std::string s) { errorProbabilitiesFileName = s; }
-        void            setUseErrorProbs(bool tf) { useErrorProbs = tf; }
+        void            setGenePresenceProbabilitiesFileName(std::string s) { genePresenceProbabilitiesFileName = s; }
+        void            setUseGenePresenceProbs(bool tf) { useGenePresenceProbs = tf; }
         void            setBranchLengthPrior(double x) { branchLengthPrior = x; }
         void            setBranchProportionsToUserTree(bool tf) { fixBranchProportionsToUserTree = tf; }
     private:
         void            printUsage(void);
         int             chainLength;
         int             burnIn;
-        bool            useErrorProbs;
+        bool            useGenePresenceProbs;
         std::string     inputFileName;
-        std::string     errorProbabilitiesFileName;
+        std::string     genePresenceProbabilitiesFileName;
         std::string     treeFileName;
         std::string     outputFileName;
         int             printFrequency;

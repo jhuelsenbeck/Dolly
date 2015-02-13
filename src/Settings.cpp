@@ -11,7 +11,7 @@
 
 Settings::Settings(int argc, char *argv[]) {
 
-#   if 1
+#   if 0
 	// set up fake command-line argument string
 	char* cmdString[24];
 	cmdString[ 0] = (char *)"dollo";
@@ -21,7 +21,7 @@ Settings::Settings(int argc, char *argv[]) {
 	cmdString[ 3] = (char *)"-tree_file";
 	cmdString[ 4] = (char *)"/Users/johnh/Dolly/example_data/single_site/with_branch_lengths.tree";
   //cmdString[ 4] = (char *)"/Users/johnh/Desktop/DolloPlusData/unrooted_tree_no_branch_lengths";
-	cmdString[ 5] = (char *)"-error_file";
+	cmdString[ 5] = (char *)"-prob_file";
 	cmdString[ 6] = (char *)"/Users/johnh/Desktop/DolloPlusData/probabilities";
 	cmdString[ 7] = (char *)"-output_file";
 	cmdString[ 8] = (char *)"/Users/johnh/Desktop/DolloPlusResults/out";
@@ -33,7 +33,7 @@ Settings::Settings(int argc, char *argv[]) {
 	cmdString[14] = (char *)"1";
 	cmdString[15] = (char *)"-sample_freq";
 	cmdString[16] = (char *)"10";
-	cmdString[17] = (char *)"-use_errors";
+	cmdString[17] = (char *)"-use_probs";
 	cmdString[18] = (char *)"no";
 	cmdString[19] = (char *)"-brlen_prior";
 	cmdString[20] = (char *)"40.0";
@@ -44,17 +44,17 @@ Settings::Settings(int argc, char *argv[]) {
 #   endif
 
     // default values
-    chainLength                    = 1000;
-    burnIn                         = 0;
-    useErrorProbs                  = false;
-    inputFileName                  = "";
-    errorProbabilitiesFileName     = "";
-    treeFileName                   = "";
-    outputFileName                 = "";
-    printFrequency                 = 10;
-    sampleFrequency                = 10;
-    branchLengthPrior              = 40.0;
-    fixBranchProportionsToUserTree = false;
+    chainLength                       = 1000;
+    burnIn                            = 0;
+    useGenePresenceProbs              = false;
+    inputFileName                     = "";
+    genePresenceProbabilitiesFileName = "";
+    treeFileName                      = "";
+    outputFileName                    = "";
+    printFrequency                    = 10;
+    sampleFrequency                   = 10;
+    branchLengthPrior                 = 40.0;
+    fixBranchProportionsToUserTree    = false;
     
 	if (argc > 1)
 		{
@@ -76,10 +76,10 @@ Settings::Settings(int argc, char *argv[]) {
 					status = "output_file";
 				else if ( cmd == "-tree_file" )
 					status = "tree_file";
-				else if ( cmd == "-error_file" )
-					status = "error_file";
-				else if ( cmd == "-use_errors" )
-					status = "use_errors";
+				else if ( cmd == "-prob_file" )
+					status = "prob_file";
+				else if ( cmd == "-use_probs" )
+					status = "use_probs";
 				else if ( cmd == "-length" )
 					status = "length";
 				else if ( cmd == "-burn" )
@@ -109,21 +109,21 @@ Settings::Settings(int argc, char *argv[]) {
 					{
 					treeFileName = argv[i];
 					}
-				else if ( status == "error_file" )
+				else if ( status == "prob_file" )
 					{
-					errorProbabilitiesFileName = argv[i];
+					genePresenceProbabilitiesFileName = argv[i];
 					}
-				else if ( status == "use_errors" )
+				else if ( status == "use_probs" )
 					{
                     if ( (argv[i][0] == 'Y' || argv[i][0] == 'y') &&
                          (argv[i][1] == 'E' || argv[i][1] == 'e') &&
                          (argv[i][2] == 'S' || argv[i][2] == 's') )
-                        useErrorProbs = true;
+                        useGenePresenceProbs = true;
                     else if ( (argv[i][0] == 'N' || argv[i][0] == 'n') &&
                               (argv[i][1] == 'O' || argv[i][1] == 'o') )
-                        useErrorProbs = false;
+                        useGenePresenceProbs = false;
                     else
-                        Msg::error("Unknown option for use_errors");
+                        Msg::error("Unknown option for use_probs");
 					}
 				else if ( status == "output_file" )
 					{
@@ -179,17 +179,17 @@ Settings::Settings(int argc, char *argv[]) {
 void Settings::print(void) {
     
 	std::cout << "   Analysis information:" << std::endl;
-	std::cout << "   * Input file name                     = " << inputFileName                  << std::endl;
-	std::cout << "   * Tree file name                      = " << treeFileName                   << std::endl;
-	std::cout << "   * Output file name                    = " << outputFileName                 << std::endl;
-	std::cout << "   * Error file name                     = " << errorProbabilitiesFileName     << std::endl;
-	std::cout << "   * Use error probabilities             = " << (useErrorProbs == 1 ? "yes" : "no") << std::endl;
-	std::cout << "   * Chain length                        = " << chainLength                    << std::endl;
-	std::cout << "   * Burn In                             = " << burnIn                         << std::endl;
-	std::cout << "   * Print frequency                     = " << printFrequency                 << std::endl;
-	std::cout << "   * Parameter sample frequency          = " << sampleFrequency                << std::endl;
-	std::cout << "   * Branch length prior parm            = " << branchLengthPrior              << std::endl;
-	std::cout << "   * Fix branch length prop to user tree = " << (fixBranchProportionsToUserTree == 1 ? "yes" : "no") << std::endl;
+	std::cout << "   * Input file name                       = " << inputFileName                     << std::endl;
+	std::cout << "   * Tree file name                        = " << treeFileName                      << std::endl;
+	std::cout << "   * Output file name                      = " << outputFileName                    << std::endl;
+	std::cout << "   * Gene presence probabilities file name = " << genePresenceProbabilitiesFileName << std::endl;
+	std::cout << "   * Use gene presence probabilities       = " << (useGenePresenceProbs == 1 ? "yes" : "no") << std::endl;
+	std::cout << "   * Chain length                          = " << chainLength                       << std::endl;
+	std::cout << "   * Burn In                               = " << burnIn                            << std::endl;
+	std::cout << "   * Print frequency                       = " << printFrequency                    << std::endl;
+	std::cout << "   * Parameter sample frequency            = " << sampleFrequency                   << std::endl;
+	std::cout << "   * Branch length prior parm              = " << branchLengthPrior                 << std::endl;
+	std::cout << "   * Fix branch length prop to user tree   = " << (fixBranchProportionsToUserTree == 1 ? "yes" : "no") << std::endl;
 	std::cout << std::endl;
 }
 
@@ -199,8 +199,8 @@ void Settings::printUsage(void) {
 	std::cout << "   -input_file <FILE NAME>  : Gene presence/absence file name [required]" << std::endl;
 	std::cout << "   -tree_file <FILE NAME>   : Tree file name in Newick format [required]" << std::endl;
 	std::cout << "   -output_file <FILE NAME> : Output file name [required]" << std::endl;
-	std::cout << "   -error_file <FILE NAME>  : File containing probabilities for gene presence [optional]" << std::endl;
-        std::cout << "   -use_errors <yes/no>     : Whether to use probabilities for gene presence [default " << (useErrorProbs == 1 ? "yes" : "no") << "]" << std::endl;
+	std::cout << "   -prob_file <FILE NAME>  : File containing probabilities for gene presence [optional]" << std::endl;
+        std::cout << "   -use_probs <yes/no>     : Whether to use probabilities for gene presence [default " << (useGenePresenceProbs == 1 ? "yes" : "no") << "]" << std::endl;
 	std::cout << "   -length <NUMBER>         : Number of MCMC cycles [default " << chainLength << "]" << std::endl;
 	std::cout << "   -burn <NUMBER>           : Number of MCMC cycles to discard (burn) [default " << burnIn << "]" << std::endl;
 	std::cout << "   -print_freq <NUMBER>     : Frequency with which information is printed to the screen [default " << printFrequency << "]" << std::endl;

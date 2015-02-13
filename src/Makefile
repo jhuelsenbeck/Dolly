@@ -1,6 +1,5 @@
 LIBS     =   -lm
 
-#CFLAGS   =  -O3 -g -pg -stdlib=libstdc++
 CFLAGS   =  -O3 -g -pg
 
 CC       =   c++

@@ -13,19 +13,19 @@ class Clades;
 class Data {
 
 	public:
-                                    Data(std::string fileName, std::string errorName, bool useErrors);
+                                    Data(std::string fileName, std::string genePresenceProbabilitiesFileName, bool useGenePresenceProbabilities);
                                    ~Data(void);
         void                        compress(void);
         int                         getNumTaxa(void) { return numTaxa; }
         int                         getNumChar(void) { return (compressedData == true ? numSitePatterns : numChar); }
         void                        getPossibleChars(int charCode, int* possibleChars);
         int                         getCharacter(int i, int j);
-        double                      getErrorProbability (int i, int j);
+        double                      getGenePresenceProbability (int i, int j);
         int                         getTaxonIndex(std::string ns);
         int                         getPartitionId(int i) { return partitionId[i]; }
         void                        listTaxa(void);
         void                        print(void);
-        void                        printErrorProbabilities(void);
+        void                        printGenePresenceProbabilities(void);
         void                        uncompress(void);
         Clades*                     getClade(int idx) { return clades[idx]; }
         std::string                 getTaxonName(int i);
@@ -53,7 +53,7 @@ class Data {
         int**                       matrix;
         int**                       compressedMatrix;
         int*                        patternCount;
-        double**                    errorProbabilities;
+        double**                    genePresenceProbabilities;
         std::vector<Clades*>        clades;
 };
 
