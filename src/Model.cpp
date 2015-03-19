@@ -312,8 +312,7 @@ void Model::initializeConditionalLikelihood(void) {
                 }
 
 	    // update transition probabilities if presence probabilities have been incorporated
-	    //if (settingsPtr->getUseGenePresenceProbs() == true && nde != theTree[s]->getRoot())
-	    if (nde != theTree[s]->getRoot())
+	    if (settingsPtr->getUseGenePresenceProbs() == true && nde != theTree[s]->getRoot())
 	        {
 		double x = nde->getBranchProportion();
 		nde->setBranchProportion(x);
