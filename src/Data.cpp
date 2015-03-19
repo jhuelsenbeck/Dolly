@@ -199,7 +199,7 @@ Data::Data(std::string fileName, std::string genePresenceProbabilitiesFileName, 
                         if (word != taxonNames[taxonNum])
                             Msg::error("Mismatched taxon names in gene presence probabilities file");
                         taxonNum++;
-                        std::cout << "     Reading taxon " << taxonNum << std::endl;
+                        //std::cout << "     Reading taxon " << taxonNum << std::endl;
                         }
                     else
                         {

@@ -218,6 +218,7 @@ void Tree::interpretTreeString(std::string treeStr) {
                     double x;
                     std::istringstream buf(nameStr);
                     buf >> x;
+		    //std::cout << "Tree::interpretTreeString calls setBranchProportion(" << x << ")";
                     p->setBranchProportion(x);
                     readingTaxon = true;
                     foundUserBrlens = true;
@@ -243,7 +244,10 @@ void Tree::interpretTreeString(std::string treeStr) {
         for (int i=0; i<nodes.size(); i++)
             {
             if (nodes[i] != root)
+	        {
+		//std::cout << "Tree::interpretTreeString calls setBranchProportion(1.0)";
                 nodes[i]->setBranchProportion(1.0);
+		}
             }
         }
     
@@ -255,16 +259,17 @@ void Tree::interpretTreeString(std::string treeStr) {
             sum += nodes[i]->getBranchProportion();
         }
     treeLength = 0.0;
-    std::cout << "lambda=" << lambda << " tl=" << treeLength << std::endl;
     for (int i=0; i<nodes.size(); i++)
         {
         if (nodes[i] != root)
             {
             double x = nodes[i]->getBranchProportion();
-            nodes[i]->setBranchProportion(x / sum);
+            //std::cout << "Tree::interpretTreeString calls setBranchProportion(" << x / sum << ")";
+	    nodes[i]->setBranchProportion(x / sum);
             treeLength += ranPtr->exponentialRv(lambda);
             }
         }
+    std::cout << "lambda=" << lambda << " tl=" << treeLength << std::endl;
 }
 
 void Tree::markPathToRootFromNode(Node* p) {
@@ -387,10 +392,14 @@ double Tree::updateBranchProportions(void) {
         if (tn != root)
             {
             if ( tn == nde )
-                tn->setBranchProportion(newProps[0]);
-            else
+	        {
+		//std::cout << "Tree::updateBranchProportions calls setBranchProportion(" << newProps[0] << ")";
+		tn->setBranchProportion(newProps[0]);
+		}
+	    else
                 {
                 double x = tn->getBranchProportion();
+		//std::cout << "Tree::updateBranchProportions calls setBranchProportion(" << x * f << ")";
                 tn->setBranchProportion(x * f);
                 n++;
                 }
@@ -408,7 +417,7 @@ double Tree::updateTreeLength(void) {
     double oldL = treeLength;
     double newL = oldL * exp( tuning*(ranPtr->uniformRv()-0.5) );
     setTreeLength(newL);
-
+    //std::cout << "Tree::updateTreeLength\toldL\t" << oldL << "\tnewL\t" << newL << std::endl;
     for (int i=0; i<nodes.size(); i++)
         {
         Node* tn = nodes[i];

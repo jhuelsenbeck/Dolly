@@ -310,6 +310,14 @@ void Model::initializeConditionalLikelihood(void) {
 		//  p[0] << "\tp[1]\t" << p[1] << std::endl;
                 p += 2;
                 }
+
+	    // update transition probabilities if presence probabilities have been incorporated
+	    //if (settingsPtr->getUseGenePresenceProbs() == true && nde != theTree[s]->getRoot())
+	    if (nde != theTree[s]->getRoot())
+	        {
+		double x = nde->getBranchProportion();
+		nde->setBranchProportion(x);
+		}
                 
             double* dp = nde->exposeDummyConditionalLikelihoods();
             dp[0] = 1.0;
@@ -777,7 +785,8 @@ double Model::updatePi(int space) {
         if ( theTreeNodes[i] != theTree[space]->getRoot() )
             {
             double x = theTreeNodes[i]->getBranchProportion();
-            theTreeNodes[i]->setBranchProportion(x);
+            //std::cout << "Model::updatePi calls setBranchProportion(" << x << ")";
+	    theTreeNodes[i]->setBranchProportion(x);
             }
         }
     

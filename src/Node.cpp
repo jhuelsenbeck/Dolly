@@ -33,6 +33,7 @@ Node::Node(Model* mp, Tree* t, int nc) {
     for (int i=0; i<2*numChar; i++)
         cls[i] = 0.0;
 
+    //std::cout << "Node::Node calls setBranchProportion(1.0)";
     setBranchProportion(1.0);
     descendants.clear();
 }
@@ -142,6 +143,12 @@ void Node::setBranchProportion(double x) {
     transitionProbabilities[1][1] = stationaryFrequencies[1] + stationaryFrequencies[0]*expPart;
 #   if 0
     std::cout << std::fixed << std::setprecision(4);
+    std::cout << " Node::setBranchProportion(" << x << ")" <<
+	 " p[0][0] " << transitionProbabilities[0][0] <<
+	 " p[0][1] " << transitionProbabilities[0][1] <<
+	 " p[1][0] " << transitionProbabilities[1][0] <<
+	 " p[1][1] " << transitionProbabilities[1][1] << std::endl;
+    /*
     for (int i=0; i<2; i++)
         {
         for (int j=0; j<2; j++)
@@ -150,5 +157,6 @@ void Node::setBranchProportion(double x) {
             }
         std::cout << std::endl;
         }
+    */
 #   endif
 }
