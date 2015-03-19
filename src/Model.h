@@ -20,7 +20,7 @@ class Model {
         double                                  averageBranchLength(int space);
         void                                    calculateStateProbs(int space);
         BranchChanges*                          getBranchChangesForNode(int nde) { return branchChanges[nde]; }
-        double*                                 getPi(int space) { return pi[space]; }
+        double*                                 getPi(int space);
         Tree*                                   getTree(int space) { return theTree[space]; }
         int                                     getNumGenes(void) { return numGenes; }
         double                                  lnLikelihood(void);

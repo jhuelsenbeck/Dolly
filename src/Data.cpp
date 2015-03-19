@@ -121,24 +121,6 @@ Data::Data(std::string fileName, std::string genePresenceProbabilitiesFileName, 
 					}
 				}
 			} while ( (ch=linestream.get()) != EOF );
-			
-		// NOTE: We probably do not need this bit of code.
-		if (line == 0)
-			{
-			/* the first line should contain the number of taxa and the sequence length */
-			std::istringstream buf(word);
-			//buf >> genomeSize;
-			}
-		else
-			{
-			for (int i=0; i<word.length(); i++)
-				{
-				char site = word.at(i);
-				if (tolower(site) == 'a' || tolower(site) == 'c' || tolower(site) == 'g' || tolower(site) == 't')
-					theSequence += tolower(site);
-				}
-			}
-		//cout << linestring << endl;
 		line++;
 		}	
 
@@ -221,37 +203,18 @@ Data::Data(std::string fileName, std::string genePresenceProbabilitiesFileName, 
                         }
                     else
                         {
-                        for (int i=0; i<word.length(); i++)
-                            {
-                            if (word.at(i) != ' ' && word.at(i) != ',')
-                                {
-                                numStr += word.at(i);
-                                }
-                            else
-                                {
-                                if (numStr != "")
-                                    {
-                                    double x;
-                                    std::istringstream buf(word);
-                                    buf >> x;
-                                    genePresenceProbabilities[taxonNum-1][siteNum++] = x;
-                                    numStr = "";
-                                    }
-                                }
-                            }
+			double presence_probability;
+			std::istringstream string_stream(word);
+			std::string probability_string;
+			while (std::getline(string_stream, probability_string, PRESENCE_PROBABILITY_DELIMITER))
+			    {
+			    presence_probability = atof( probability_string.c_str() );
+			    genePresenceProbabilities[taxonNum-1][siteNum++] = presence_probability;
+			    //std::cout << "Data::Data\ttaxon\t" << taxonNum << "\tgene\t" << siteNum - 1 << "\tprob\t" <<
+			    //	 genePresenceProbabilities[taxonNum-1][siteNum-1] << std::endl;
+			    }
                         }
                     }
-                    
-                // check that the numStr is empty as it should be at this point (I think)
-                if (numStr != "")
-                    {
-                    double x;
-                    std::istringstream buf(word);
-                    buf >> x;
-                    genePresenceProbabilities[taxonNum-1][siteNum++] = x;
-                    numStr = "";
-                    }
-
                 } while ( (ch=linestream.get()) != EOF );
                 
             line++;

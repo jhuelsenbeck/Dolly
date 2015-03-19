@@ -306,6 +306,8 @@ void Model::initializeConditionalLikelihood(void) {
                         p[1] = e;
                         }
                     }
+		//std::cout << "Model::initializeConditionalLikelihood\ttaxon\t" << i << "\tgene\t" << j << "\tp[0]\t" <<
+		//  p[0] << "\tp[1]\t" << p[1] << std::endl;
                 p += 2;
                 }
                 
@@ -751,22 +753,24 @@ double Model::update(int space) {
 double Model::updatePi(int space) {
 
     double alpha0 = 200.0;
-	std::vector<double> aForward(2);
-	std::vector<double> aReverse(2);
-	std::vector<double> oldFreqs(2);
+    std::vector<double> aForward(2);
+    std::vector<double> aReverse(2);
+    std::vector<double> oldFreqs(2);
     std::vector<double> newFreqs(2);
-	for (int i=0; i<2; i++)
-		{
-		oldFreqs[i] = pi[space][i];
-		aForward[i] = pi[space][i] * alpha0;
-		}
-	ranPtr->dirichletRv(aForward, newFreqs);
-	for (int i=0; i<2; i++)
+    for (int i=0; i<2; i++)
         {
-		aReverse[i] = newFreqs[i] * alpha0;
-        pi[space][i] = newFreqs[i];
+	oldFreqs[i] = pi[space][i];
+	aForward[i] = pi[space][i] * alpha0;
+	}
+    ranPtr->dirichletRv(aForward, newFreqs);
+    for (int i=0; i<2; i++)
+        {
+	aReverse[i] = newFreqs[i] * alpha0;
+	pi[space][i] = newFreqs[i];
         }
     
+    //std::cout << "Model::updatePi(" << space << ")\tpi[0]\t" << pi[space][0] << "\tpi[1]\t" << pi[space][1] << std::endl;
+
     std::vector<Node*> theTreeNodes = theTree[space]->exposeNodes();
     for (int i=0; i<theTreeNodes.size(); i++)
         {
@@ -777,6 +781,11 @@ double Model::updatePi(int space) {
             }
         }
     
-	return ranPtr->lnDirichletPdf(aReverse, oldFreqs) - ranPtr->lnDirichletPdf(aForward, newFreqs);
+    return ranPtr->lnDirichletPdf(aReverse, oldFreqs) - ranPtr->lnDirichletPdf(aForward, newFreqs);
 }
 
+double* Model::getPi(int space) {
+
+    //std::cout << "Model::getPi\tspace\t" << space << "\tpi[0]\t" << pi[space][0] << "\tpi[1]\t" << pi[space][1] << std::endl;
+    return pi[space];
+}

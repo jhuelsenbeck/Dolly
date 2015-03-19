@@ -5,6 +5,8 @@
 #ifndef Data_H
 #define Data_H
 
+#define PRESENCE_PROBABILITY_DELIMITER ','
+
 #include <string>
 #include <vector>
 
